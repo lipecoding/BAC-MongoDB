@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BAC___MongoDB.Model
 {
-    internal class AcountData
+    internal class UserDTO
     {
         private string account = string.Empty;
         private string agency = string.Empty;
@@ -14,11 +14,10 @@ namespace BAC___MongoDB.Model
         private string balance = string.Empty;
         private string currency = string.Empty;
 
-        public string Agency { get => Agency1; set => Agency1 = value; }
         public string Account { get => account; set => account = value; }
-        public string Agency1 { get => agency; set => agency = value; }
         public string Name { get => name; set => name = value; }
         public string Balance { get => balance; set => balance = value; }
         public string Currency { get => currency; set => currency = value; }
+        public string Agency { get => agency; set => agency = value; }
     }
 }

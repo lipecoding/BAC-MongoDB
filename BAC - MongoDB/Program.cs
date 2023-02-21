@@ -11,6 +11,12 @@ namespace BAC___MongoDB
         {
             try
             {
+                DAO.UserDAO connection = new DAO.UserDAO();
+
+                if (connection.con())
+                    inicio();
+                else
+                    throw new Exception("Conexão perdida!");
 
                 
             }
@@ -24,7 +30,7 @@ namespace BAC___MongoDB
         {
             try
             {
-                string accountInfo = string.Empty;
+                string? accountInfo = string.Empty;
 
                 Console.WriteLine("Bem vindo ao BAC!");
                 Console.WriteLine();
@@ -34,6 +40,20 @@ namespace BAC___MongoDB
 
                 if (!string.IsNullOrEmpty(accountInfo))
                 {
+                    Model.UserDTO acountData = new Model.UserDTO();
+
+                    acountData.Agency = accountInfo.Substring(0, 4);
+                    acountData.Account = accountInfo.Substring(5);
+
+                    DAO.UserDAO connection = new DAO.UserDAO();
+
+                    if(connection.access(acountData.Agency, acountData.Account))
+                    {
+                        View.Main main = new View.Main();
+
+                        main.menu(acountData.Account);
+                    }
+
 
                 }
                 else
