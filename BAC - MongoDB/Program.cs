@@ -45,9 +45,9 @@ namespace BAC___MongoDB
                     acountData.Agency = accountInfo.Substring(0, 4);
                     acountData.Account = accountInfo.Substring(5);
 
-                    DAO.UserDAO connection = new DAO.UserDAO();
+                    DAO.UserDAO userDAO = new DAO.UserDAO();
 
-                    if(connection.access(acountData.Agency, acountData.Account))
+                    if(userDAO.access(acountData.Agency, acountData.Account))
                     {
                         View.Main main = new View.Main();
 

@@ -1,5 +1,6 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Driver;
+using MongoDB.Driver.Core.Servers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,11 @@ namespace BAC___MongoDB.DAO
 {
     internal class UserDAO
     {
-        private static MongoClientSettings _settings = MongoClientSettings.FromUrl(MongoUrl.Create("mongodb://localhost:27017"));
+        private static MongoClientSettings _settings = new MongoClientSettings
+        {
+            ServerSelectionTimeout = new TimeSpan(0, 0, 5),
+            Server = new MongoServerAddress("0.0.0.0", 27017)
+        };
         private static MongoClient _client = new MongoClient(_settings);
         private static IMongoDatabase _db = _client.GetDatabase("BAC");
         private IMongoCollection<BsonDocument> acc_collection = _db.GetCollection<BsonDocument>("account");
@@ -18,10 +23,19 @@ namespace BAC___MongoDB.DAO
 
         public bool con()
         {
-            if (_client != null)
+            try
+            {
+                var testeCon = _db.GetCollection<BsonDocument>("testeCon");
+                var filter = builder.Eq("Teste", "111");
+
+                var result = testeCon.Find(filter);
+
                 return true;
-            else
+            }
+            catch (TimeoutException)
+            {
                 return false;
+            }
         }
 
         public bool access(string agency, string account)
@@ -43,7 +57,7 @@ namespace BAC___MongoDB.DAO
                     return false;
                 }
             }
-            catch
+            catch (TimeoutException)
             {
                 return false;
             }
@@ -82,9 +96,19 @@ namespace BAC___MongoDB.DAO
                         }
                     case "balance":
                         {
-                            string[] resultbal = result.ToString().Split(" ");
 
-                            return resultbal[16];
+                            try
+                            {
+                                string[] resultbal = result.ToString().Split(" ");
+                                string stringbal = $"O saldo da sua conta é de: {resultString(result, "currency")} {resultbal[16]}.";
+                                return stringbal;
+                            }
+                            catch (Exception err)
+                            {
+                                Console.WriteLine(err.Message);
+                                return string.Empty;
+                            }
+
                         }
                 }
 
