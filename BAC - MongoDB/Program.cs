@@ -23,6 +23,7 @@ namespace BAC___MongoDB
             catch (Exception err) 
             { 
                 Console.WriteLine(err.Message);
+                Main(args);
             }
         }
 
@@ -31,7 +32,7 @@ namespace BAC___MongoDB
             try
             {
                 string? accountInfo = string.Empty;
-
+                Console.Clear();
                 Console.WriteLine("Bem vindo ao BAC!");
                 Console.WriteLine();
                 Console.WriteLine("Digite o número da agência e conta(formato: agencia/conta)");
@@ -53,8 +54,6 @@ namespace BAC___MongoDB
 
                         main.menu(acountData.Account);
                     }
-
-
                 }
                 else
                 {

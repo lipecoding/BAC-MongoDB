@@ -14,23 +14,30 @@ namespace BAC___MongoDB.DAO
         private static MongoClientSettings _settings = new MongoClientSettings
         {
             ServerSelectionTimeout = new TimeSpan(0, 0, 5),
-            Server = new MongoServerAddress("0.0.0.0", 27017)
+            Server = new MongoServerAddress("localhost", 27017)
         };
         private static MongoClient _client = new MongoClient(_settings);
         private static IMongoDatabase _db = _client.GetDatabase("BAC");
-        private IMongoCollection<BsonDocument> acc_collection = _db.GetCollection<BsonDocument>("account");
-        private FilterDefinitionBuilder<BsonDocument> builder = Builders<BsonDocument>.Filter;
+        private IMongoCollection<BsonDocument> acc_collection = _db.GetCollection<BsonDocument>("account");        
 
         public bool con()
         {
             try
             {
                 var testeCon = _db.GetCollection<BsonDocument>("testeCon");
-                var filter = builder.Eq("Teste", "111");
+                var builder = Builders<BsonDocument>.Filter;
+                var filter = builder.AnyEq("Teste", "111");
 
-                var result = testeCon.Find(filter);
+                var result = testeCon.Find(filter).First().ToJson();
 
-                return true;
+                if (!string.IsNullOrEmpty(result.ToString()))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
             }
             catch (TimeoutException)
             {
@@ -62,15 +69,21 @@ namespace BAC___MongoDB.DAO
                 return false;
             }
         }
-
+        #region get db
         public string userdata(string account, string type)
         {
             try
             {
+                var builder = Builders<BsonDocument>.Filter;
                 var filter = builder.Eq("_account", account);
 
                 var result = acc_collection.Find(filter).First().ToJson();
 
+                if(type == "updatebal")
+                {
+                    string[] resultUpBal = result.Split(" ");
+                    return resultUpBal[16];
+                }
                 return resultString(result, type);
             }
             catch (Exception err)
@@ -88,11 +101,18 @@ namespace BAC___MongoDB.DAO
                 {
                     case "name":
                         {
-                            string[] r3 = result.ToString().Split(" ");
+                            try
+                            {
+                                string[] resultsplit = result.ToString().Split(" ");
 
-                            string resultname = $"{r3[9]} {r3[10]}".Replace(",", "");
-                            resultname = resultname.Replace('"'.ToString(), "");
-                            return resultname;
+                                string resultname = $"{resultsplit[9]} {resultsplit[10]}".Replace(",", "").Replace('"'.ToString(), "");
+                                return resultname;
+                            }
+                            catch(Exception err)
+                            {
+                                Console.WriteLine(err.Message);
+                                return string.Empty;
+                            }
                         }
                     case "balance":
                         {
@@ -100,7 +120,7 @@ namespace BAC___MongoDB.DAO
                             try
                             {
                                 string[] resultbal = result.ToString().Split(" ");
-                                string stringbal = $"O saldo da sua conta é de: {resultString(result, "currency")} {resultbal[16]}.";
+                                string stringbal = $"O saldo da sua conta é de: {resultString(result, "currency_bal")} {resultbal[16]}.";
                                 return stringbal;
                             }
                             catch (Exception err)
@@ -109,6 +129,20 @@ namespace BAC___MongoDB.DAO
                                 return string.Empty;
                             }
 
+                        }
+                    case "currency_bal":
+                        {
+                            try
+                            {
+                                string[] resultcurrency = result.ToString().Split(" ");
+                                string stringcurrency = resultcurrency[13].Replace(",", "").Replace('"'.ToString(), "");
+                                return stringcurrency;
+                            }
+                            catch (Exception err)
+                            {
+                                Console.WriteLine(err.Message);
+                                return string.Empty;
+                            }
                         }
                 }
 
@@ -120,5 +154,36 @@ namespace BAC___MongoDB.DAO
                 return string.Empty;
             }
         }
+        #endregion
+
+        #region update db
+        public bool updateBal(string[] account, double bal)
+        {
+            try
+            {
+                var collection = _db.GetCollection<BsonDocument>("account");
+                var builder = Builders<BsonDocument>.Filter;
+
+                var filter0 = builder.Eq("_account", account[0]);
+                var filter1 = builder.Eq("_account", account[1]);
+
+                double bal0 = Double.Parse(userdata(account[0], "updatebal")) - bal;
+                double bal1 = Double.Parse(userdata(account[1], "updatebal"));
+
+                var update0 = Builders<BsonDocument>.Update.Set("_balance", bal0);
+                var update1 = Builders<BsonDocument>.Update.Set("_balance", bal1);
+
+                collection.UpdateOne(filter0, update0);
+                collection.UpdateOne(filter1, update1);
+
+                return true;
+            } 
+            catch (Exception err)
+            {
+                return false;
+            }
+        }
+        #endregion
+
     }
 }
