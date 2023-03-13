@@ -25,19 +25,9 @@ namespace BAC___MongoDB.DAO
             try
             {
                 var testeCon = _db.GetCollection<BsonDocument>("testeCon");
-                var builder = Builders<BsonDocument>.Filter;
-                var filter = builder.AnyEq("Teste", "111");
 
-                var result = testeCon.Find(filter).First().ToJson();
-
-                if (!string.IsNullOrEmpty(result.ToString()))
-                {
+                if (!string.IsNullOrEmpty(testeCon.Find().First().ToJson()))
                     return true;
-                }
-                else
-                {
-                    return false;
-                }
             }
             catch (TimeoutException)
             {
