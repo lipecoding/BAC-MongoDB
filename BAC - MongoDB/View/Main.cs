@@ -40,7 +40,7 @@ namespace BAC___MongoDB.View
                             Console.WriteLine("Qual valor a ser transferido?");
                             double bal = Double.Parse(Console.ReadLine());
 
-                            userDAO.updateBal(accountArray, bal);
+                            userDAO.transBal(accountArray, bal);
 
                             back();
 
@@ -49,8 +49,30 @@ namespace BAC___MongoDB.View
                     case "2":
                         {
                             Console.Clear();
-                            string bal = userDAO.userdata(account, "balance");
-                            Console.WriteLine(bal);
+                            Console.WriteLine(userDAO.userdata(account, "balance"));
+                            back();
+                        }
+                        break;
+                    case "3":
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Qual deve ser a moeda padrão?");
+                            string? currency = Console.ReadLine();
+
+                            userDAO.updatecurrency(account, currency);
+
+                            back();
+
+                        }
+                        break;
+                    case "4":
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Qual será o valor do saque?");
+                            double bal = double.Parse(Console.ReadLine());
+
+                            userDAO.decreasebal(account, bal);
+
                             back();
                         }
                         break;

@@ -65,6 +65,7 @@ namespace BAC___MongoDB
             catch(Exception err)
             {
                 Console.WriteLine(err.Message);
+                inicio();
             }
         }
     }
