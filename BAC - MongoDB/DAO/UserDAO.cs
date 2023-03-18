@@ -60,6 +60,11 @@ namespace BAC___MongoDB.DAO
             }
             catch (Exception err)
             {
+                if (err.Message == "Sequence contains no elements")
+                {
+                    Console.WriteLine("Dados da conta inexistentes!");
+                    Program.inicio();
+                }
                 return false;
             }
         }
@@ -72,13 +77,13 @@ namespace BAC___MongoDB.DAO
                 var filter = builder.Eq("_account", account);
 
                 var result = acc_collection.Find(filter).First().ToJson();
+                string response = resultString(result, type);
 
-                if (type == "updatebal")
+                if (string.IsNullOrEmpty(response))
                 {
-                    string[] resultUpBal = result.Split(" ");
-                    return resultUpBal[16].Replace(",", "");
+                    throw new Exception($"O tipo {type} retornou erro.");
                 }
-                return resultString(result, type);
+                return response;
             }
             catch (Exception err)
             {
@@ -137,6 +142,11 @@ namespace BAC___MongoDB.DAO
                                 Console.WriteLine(err.Message);
                                 return string.Empty;
                             }
+                        }
+                    case "updatebal":
+                        {
+                            string[] resultUpBal = result.Split(" ");
+                            return resultUpBal[16].Replace(",", "");
                         }
                 }
 
