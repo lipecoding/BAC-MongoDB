@@ -82,6 +82,8 @@ namespace BAC___MongoDB.View
             catch (Exception err)
             {
                 Console.Write(err.Message);
+                
+                back();
             }
 
         }
